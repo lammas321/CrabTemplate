@@ -14,16 +14,18 @@
 		<AssemblyName>lammas123.CrabTemplate</AssemblyName>
 		<Product>CrabTemplate</Product>
 		<Version>0.0.1</Version>
-
-		<SteamDir Condition="'$(SteamDir)' == ''">S:\Steam</SteamDir>
-		<ProfileDir Condition="'$(ProfileDir)' == ''">S:\Steam\steamapps\common\Crab Game</ProfileDir>
-		<UnhollowedDir>$(ProfileDir)\BepInEx\unhollowed</UnhollowedDir>
+		
+		<AutoLaunchDir Condition="'$(AutoLaunchDir)' == ''">lammas123-CrabTemplate</AutoLaunchDir>
+		<SteamPath Condition="'$(SteamPath)' == ''">S:/Steam/steam.exe</SteamPath>
+		
+		<ProfileDir Condition="'$(ProfileDir)' == ''">C:/Users/lamma/AppData/Roaming/r2modmanPlus-local/CrabGame/profiles/modded</ProfileDir>
+		<UnhollowedDir>$(ProfileDir)/BepInEx/unhollowed</UnhollowedDir>
 
 		<!--
 			If you plan to depend on other mods (ex. CrabDevKit) you may uncomment the following line and correct the path.
 			Further down is a commented out example of DepsDir being used to reference CrabDevKit.
 		-->
-		<!-- <DepsDir Condition="'$(DepsDir)' == ''">C:\Users\lamma\source\repos\Crab Game</DepsDir> -->
+		<!-- <DepsDir Condition="'$(DepsDir)' == ''">C:/Users/lamma/source/repos/Crab Game</DepsDir> -->
 	</PropertyGroup>
 
 
@@ -55,7 +57,7 @@
 
 	<!-- Checks -->
 	<Target Name="CheckUnhollowed" BeforeTargets="ResolveAssemblyReferences">
-		<Error Condition="!Exists('$(UnhollowedDir)\Assembly-CSharp.dll')" Text="Unhollowed assemblies not found. Verify $(UnhollowedDir) (your .csproj's UnhollowedDir) is correct and run BepInEx Il2Cpp unhollowing first." />
+		<Error Condition="!Exists('$(UnhollowedDir)/Assembly-CSharp.dll')" Text="Unhollowed assemblies not found. Verify $(UnhollowedDir) (your .csproj's UnhollowedDir) is correct and run BepInEx Il2Cpp unhollowing first." />
 	</Target>
 
 	<Target Name="CheckDeps" BeforeTargets="ResolveAssemblyReferences" Condition="'$(DepsDir)' != ''">
@@ -65,6 +67,12 @@
 
 
 	<!-- Building -->
+	<ItemGroup>
+		<Compile Remove="Thunderstore/**" />
+		<EmbeddedResource Remove="Thunderstore/**" />
+		<None Remove="Thunderstore/**" />
+	</ItemGroup>
+
 	<Target Name="ClearReferenceCopyLocalPaths" AfterTargets="ResolveAssemblyReferences">
 		<ItemGroup>
 			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
@@ -72,8 +80,13 @@
 	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(AutoLaunch)' == 'true'">
-		<Exec Command="copy &quot;$(OutDir)$(AssemblyName).dll&quot; &quot;$(ProfileDir)\BepInEx\plugins\$(AssemblyName)\$(AssemblyName).dll&quot;" />
-		<Exec Command="$(SteamDir)\steam.exe steam://rungameid/1782210" />
+		<MakeDir Directories="$(ProfileDir)/BepInEx/plugins/$(AutoLaunchDir)" Condition="!Exists('$(ProfileDir)/BepInEx/plugins/$(AutoLaunchDir)')" />
+		
+		<Copy SourceFiles="$(OutDir)$(AssemblyName).dll"
+			  DestinationFiles="$(ProfileDir)/BepInEx/plugins/$(AutoLaunchDir)/$(AssemblyName).dll"
+			  SkipUnchangedFiles="true" />
+		
+		<Exec Command="$(SteamPath) steam://rungameid/1782210" Condition="Exists('$(SteamPath)')" />
 	</Target>
 	
 	
@@ -93,64 +106,64 @@
 	<ItemGroup>
 		<!-- BepInEx Assemblies -->
 		<Reference Include="0Harmony" Publicize="true">
-			<HintPath>$(ProfileDir)\BepInEx\core\0Harmony.dll</HintPath>
+			<HintPath>$(ProfileDir)/BepInEx/core/0Harmony.dll</HintPath>
 		</Reference>
 		
 		<!-- Game Assemblies -->
 		<Reference Include="Assembly-CSharp">
-			<HintPath>$(UnhollowedDir)\Assembly-CSharp.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Assembly-CSharp.dll</HintPath>
 		</Reference>
 		<Reference Include="Assembly-CSharp-firstpass">
-			<HintPath>$(UnhollowedDir)\Assembly-CSharp-firstpass.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Assembly-CSharp-firstpass.dll</HintPath>
 		</Reference>
 		
 		<!-- Il2Cpp Assemblies -->
 		<Reference Include="Il2Cppmscorlib">
-			<HintPath>$(UnhollowedDir)\Il2Cppmscorlib.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Il2Cppmscorlib.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2CppSystem">
-			<HintPath>$(UnhollowedDir)\Il2CppSystem.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Il2CppSystem.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2CppSystem.Core">
-			<HintPath>$(UnhollowedDir)\Il2CppSystem.Core.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Il2CppSystem.Core.dll</HintPath>
 		</Reference>
 
 		<!-- Other Mod Assemblies -->
 		<!-- <Reference Include="CrabDevKit">
-			<HintPath>$(DepsDir)\CrabDevKit\bin\Release\netstandard2.1\CrabDevKit.dll</HintPath>
+			<HintPath>$(DepsDir)/lammas123.CrabDevKit/bin/Release/netstandard2.1/lammas123.CrabDevKit.dll</HintPath>
 		</Reference> -->
 
 		<!-- Unity Assemblies-->
 		<Reference Include="UnityEngine.AnimationModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.AnimationModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.AnimationModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.AudioModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.AudioModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.AudioModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.CoreModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.CoreModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.InputLegacyModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.InputLegacyModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.InputLegacyModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.ParticleSystemModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.ParticleSystemModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.ParticleSystemModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.PhysicsModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.PhysicsModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.PhysicsModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.TextRenderingModule">
-			<HintPath>$(UnhollowedDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.TextRenderingModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.UI">
-			<HintPath>$(UnhollowedDir)\UnityEngine.UI.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/UnityEngine.UI.dll</HintPath>
 		</Reference>
 		
 		<Reference Include="Unity.PostProcessing.Runtime">
-			<HintPath>$(UnhollowedDir)\Unity.PostProcessing.Runtime.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Unity.PostProcessing.Runtime.dll</HintPath>
 		</Reference>
 		<Reference Include="Unity.TextMeshPro">
-			<HintPath>$(UnhollowedDir)\Unity.TextMeshPro.dll</HintPath>
+			<HintPath>$(UnhollowedDir)/Unity.TextMeshPro.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 </Project>

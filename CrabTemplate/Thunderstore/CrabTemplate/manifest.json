@@ -1,0 +1,9 @@
+{
+    "name": "CrabTemplate",
+    "version_number": "0.0.1",
+    "description": "A template mod.",
+    "website_url": "https://github.com/lammas321/CrabTemplate/",
+    "dependencies": [
+        "BepInEx-BepInExPack_CrabGame-6.0.577"
+    ]
+}
