@@ -87,6 +87,16 @@
 			  SkipUnchangedFiles="true" />
 		
 		<Exec Command="$(SteamPath) steam://rungameid/1782210" Condition="Exists('$(SteamPath)')" />
+		<Warning Condition="!Exists('$(SteamPath)')" Text="The Steam path $(SteamPath) does not exist." />
+	</Target>
+
+	<Target Name="Thunderstore" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release'">
+		<Copy SourceFiles="$(OutDir)$(AssemblyName).dll"
+		      DestinationFiles="$(MSBuildProjectDirectory)/Thunderstore/$(Product)/BepInEx/plugins/$(AssemblyName).dll"
+			  Condition="Exists('$(MSBuildProjectDirectory)/Thunderstore/$(Product)/BepInEx/plugins')"
+			  SkipUnchangedFiles="true" />
+		
+		<Warning Condition="!Exists('$(MSBuildProjectDirectory)\Thunderstore\$(Product)\BepInEx\plugins')" Text="The Thunderstore directory $(MSBuildProjectDirectory)/Thunderstore/$(Product)/BepInEx/plugins does not exist." />
 	</Target>
 	
 	
